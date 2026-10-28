@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Remibuds — Never miss a dose again</title>
+<meta name="description" content="Remibuds is a free, private reminder app for medicines, creams and daily routines. Alarm-style reminders, cute capsule buddies, history and undo. Android only, no account, no ads.">
+<meta name="theme-color" content="#7c6bd6">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+  :root{
+    --ink:#22223b; --muted:#5b5b74; --bg:#fdf9f3; --card:#ffffff;
+    --lav:#7c6bd6; --lav-soft:#efeafd; --sage:#7ba889; --sage-soft:#e9f3ec;
+    --peach:#ff9d7a; --peach-soft:#ffeee7; --gold:#e8a33d; --gold-soft:#fdf3e0;
+    --line:#ece5da; --radius:20px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.55; -webkit-text-size-adjust:100%;}
+  img{max-width:100%; display:block;}
+  a{color:var(--lav);}
+  .wrap{max-width:920px; margin:0 auto; padding:0 20px;}
+
+  /* Top bar */
+  .topbar{position:sticky; top:0; z-index:50; background:rgba(253,249,243,.94);
+    backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .topbar .wrap{display:flex; align-items:center; gap:10px; padding-top:10px; padding-bottom:10px;}
+  .brand{display:flex; align-items:center; gap:9px; text-decoration:none; color:var(--ink);
+    font-weight:800; font-size:20px; letter-spacing:.2px;}
+  .brand img{width:34px; height:34px;}
+  .topbar .spacer{flex:1;}
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    border-radius:999px; padding:11px 20px; font-weight:700; font-size:15px; text-decoration:none;
+    border:2px solid transparent; cursor:pointer; transition:transform .08s ease, box-shadow .08s ease;}
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--lav); color:#fff; box-shadow:0 6px 16px rgba(124,107,214,.35);}
+  .btn-donate{background:#fff; color:#c2410c; border-color:#fdba74; box-shadow:0 4px 12px rgba(234,88,12,.12);}
+  .btn-ghost{background:#fff; color:var(--ink); border-color:var(--line);}
+  .btn-sm{padding:8px 15px; font-size:14px;}
+  .topbar .btn-donate{margin-left:4px;}
+
+  /* Hero */
+  .hero{text-align:center; padding:44px 0 10px;}
+  .hero-art{width:210px; max-width:60vw; margin:0 auto 6px;}
+  .hero h1{font-size:clamp(34px,7vw,52px); line-height:1.12; letter-spacing:-.5px; margin:8px 0 10px;}
+  .hero h1 .accent{color:var(--lav);}
+  .hero p.sub{font-size:clamp(17px,3.4vw,20px); color:var(--muted); max-width:600px; margin:0 auto 20px;}
+  .badges{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:0 0 22px;}
+  .badge{background:#fff; border:1px solid var(--line); border-radius:999px; padding:6px 13px;
+    font-size:13.5px; font-weight:600; color:var(--muted);}
+  .hero-cta{display:flex; flex-wrap:wrap; gap:12px; justify-content:center;}
+  .hero-cta .btn{padding:15px 28px; font-size:17px;}
+  .version-line{margin-top:14px; font-size:13.5px; color:var(--muted);}
+  .version-line b{color:var(--ink);}
+
+  /* Sections */
+  section{padding:44px 0 6px;}
+  h2{font-size:clamp(24px,5vw,30px); letter-spacing:-.3px; text-align:center; margin-bottom:8px;}
+  .section-sub{text-align:center; color:var(--muted); max-width:600px; margin:0 auto 24px; font-size:16px;}
+
+  /* Features */
+  .grid{display:grid; grid-template-columns:1fr; gap:14px;}
+  @media (min-width:640px){ .grid{grid-template-columns:1fr 1fr;} }
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px; display:flex; gap:14px; align-items:flex-start;}
+  .card img{width:64px; height:64px; flex:none; border-radius:16px; background:var(--lav-soft);}
+  .card h3{font-size:17.5px; margin-bottom:4px;}
+  .card p{font-size:14.5px; color:var(--muted);}
+  .card:nth-child(2) img{background:var(--sage-soft);}
+  .card:nth-child(3) img{background:var(--peach-soft);}
+  .card:nth-child(4) img{background:var(--gold-soft);}
+  .card:nth-child(5) img{background:var(--lav-soft);}
+  .card:nth-child(6) img{background:var(--sage-soft);}
+
+  /* Donate band */
+  .band{background:linear-gradient(135deg,#7c6bd6,#9a7ff0); color:#fff; border-radius:var(--radius);
+    padding:24px 22px; display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between;}
+  .band p{font-size:18px; font-weight:700; line-height:1.4;}
+  .band p span{display:block; font-size:14px; font-weight:500; opacity:.92; margin-top:3px;}
+  .band .btn{background:#fff; color:var(--lav); border-color:#fff; white-space:nowrap;}
+
+  /* Install steps */
+  .steps{counter-reset:step; display:grid; gap:12px; max-width:640px; margin:0 auto;}
+  .step{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 18px 16px 62px;
+    position:relative; font-size:15.5px;}
+  .step b{display:block; font-size:16px; margin-bottom:2px;}
+  .step span{color:var(--muted); font-size:14.5px;}
+  .step::before{counter-increment:step; content:counter(step); position:absolute; left:16px; top:16px;
+    width:32px; height:32px; border-radius:50%; background:var(--lav); color:#fff; font-weight:800;
+    display:flex; align-items:center; justify-content:center; font-size:16px;}
+  .fineprint{max-width:640px; margin:16px auto 0; font-size:13.5px; color:var(--muted); text-align:center;}
+
+  /* Donate section */
+  .donate-card{background:var(--card); border:2px solid #fdba74; border-radius:24px; padding:28px 22px;
+    max-width:640px; margin:0 auto; text-align:center; box-shadow:0 10px 30px rgba(234,88,12,.10);}
+  .donate-card .donate-art{width:96px; margin:0 auto 4px;}
+  .donate-card h2{margin-bottom:6px;}
+  .donate-card p{color:var(--muted); font-size:15.5px; max-width:460px; margin:0 auto 18px;}
+  .qr-box{background:#fff; border:1px solid var(--line); border-radius:18px; padding:16px;
+    display:inline-block; margin-bottom:6px;}
+  .qr-box img{width:200px; height:200px;}
+  .qr-cap{font-size:13.5px; color:var(--muted); margin-bottom:18px;}
+  .donate-actions{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:16px;}
+  .upi-row{display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:wrap;}
+  .upi-id{background:var(--bg); border:1px dashed #d8cfc0; border-radius:10px; padding:9px 14px;
+    font-family:ui-monospace,Menlo,Consolas,monospace; font-size:14.5px; word-break:break-all;}
+  .copy-btn{background:var(--ink); color:#fff; border:none; border-radius:10px; padding:10px 16px;
+    font-weight:700; font-size:14px; cursor:pointer;}
+  .copy-btn:active{transform:scale(.97);}
+
+  /* FAQ */
+  .faq{max-width:680px; margin:0 auto; display:grid; gap:10px;}
+  .faq details{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:15px 18px;}
+  .faq summary{font-weight:700; font-size:15.5px; cursor:pointer; list-style:none;}
+  .faq summary::-webkit-details-marker{display:none;}
+  .faq p{margin-top:8px; font-size:14.5px; color:var(--muted);}
+
+  /* Final CTA + footer */
+  .final{text-align:center; padding:48px 0 10px;}
+  .final .btn{padding:15px 30px; font-size:17px;}
+  footer{border-top:1px solid var(--line); margin-top:48px; padding:26px 0 40px; text-align:center;
+    font-size:14.5px; color:var(--muted);}
+  footer .love{font-size:16px; color:var(--ink); font-weight:600; margin-bottom:6px;}
+  footer .love .heart{color:#e11d48;}
+  footer a{font-weight:600; text-decoration:none;}
+  footer a:hover{text-decoration:underline;}
+  footer .foot-links{margin:10px 0; display:flex; gap:18px; justify-content:center; flex-wrap:wrap;}
+  footer .tiny{font-size:12.5px; margin-top:10px;}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="icon.svg" alt="Remibuds logo">Remibuds</a>
+    <span class="spacer"></span>
+    <a class="btn btn-donate btn-sm" href="#donate">♥ Donate</a>
+    <a class="btn btn-primary btn-sm" href="remibuds-1.6.apk" download="Remibuds-1.6.apk">Download</a>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap">
+
+    <!-- HERO -->
+    <div class="hero">
+      <img class="hero-art" src="art/capsule-friends.svg" alt="Remibuds capsule friends">
+      <h1>Never miss a dose <span class="accent">again.</span></h1>
+      <p class="sub">Remibuds is a friendly reminder app for medicines, creams and daily routines — with alarm-style reminders that actually reach you, and cute capsule buddies that make routines feel lighter.</p>
+      <div class="badges">
+        <span class="badge">Free forever</span>
+        <span class="badge">No ads</span>
+        <span class="badge">No account</span>
+        <span class="badge">Private — stays on your phone</span>
+      </div>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="remibuds-1.6.apk" download="Remibuds-1.6.apk">⬇ Download the app</a>
+        <a class="btn btn-donate" href="#donate">♥ Donate to keep it free</a>
+      </div>
+      <p class="version-line"><b>Version 1.6</b> · Android only · About 122 KB · Free</p>
+    </div>
+
+    <!-- FEATURES -->
+    <section>
+      <h2>Everything you need to stay on routine</h2>
+      <p class="section-sub">Built for real life — for medicines, creams, meals, walks, workouts and everything in between.</p>
+      <div class="grid">
+        <div class="card">
+          <img src="art/art-medicine-morning.svg" alt="">
+          <div><h3>Alarm-style reminders</h3>
+          <p>Reminders ring over whatever you are doing — even on the lock screen — sharp at the set time. Choose notification-only, or ring + notification, with preset alarm tones or your own custom audio.</p></div>
+        </div>
+        <div class="card">
+          <img src="art/art-medicine-afternoon.svg" alt="">
+          <div><h3>Every kind of routine</h3>
+          <p>Medicines (11 types), creams and gels, meals, water, walks, cycling, gym, rest, sleep and to-dos. Group routines under one shared reminder time — each member still tracked on its own.</p></div>
+        </div>
+        <div class="card">
+          <img src="art/art-medicine-night.svg" alt="">
+          <div><h3>Cute capsule buddies</h3>
+          <p>Every routine gets its own capsule illustration, guessed automatically from its name and time — or pick your favourite when you create it. Routines feel less like chores and more like company.</p></div>
+        </div>
+        <div class="card">
+          <img src="art/art-generic.svg" alt="">
+          <div><h3>Today, at a glance</h3>
+          <p>Big, easy-to-tap blocks with the name, time and state of each dose. Mark taken, snooze or skip in one tap — and opening a card never logs a dose by accident.</p></div>
+        </div>
+        <div class="card">
+          <img src="art/art-rest.svg" alt="">
+          <div><h3>History you can trust</h3>
+          <p>Every record is timestamped, with Undo for any entry. Archived routines stay in your history forever, and you can export everything as a CSV file — all of it, or a date range.</p></div>
+        </div>
+        <div class="card">
+          <img src="art/art-sleep.svg" alt="">
+          <div><h3>Private by design</h3>
+          <p>No account, no sign-up, no internet needed. Your routines and records live only on your phone — never uploaded, never shared. And there are no ads, ever.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DONATE BAND -->
+    <section>
+      <div class="band">
+        <p>Loving Remibuds? ♥<span>Your donation keeps it free, ad-free and running.</span></p>
+        <a class="btn" href="#donate">Donate now ♥</a>
+      </div>
+    </section>
+
+    <!-- INSTALL -->
+    <section>
+      <h2>Get it on your Android phone</h2>
+      <p class="section-sub">Straight from here — no app store needed.</p>
+      <div class="steps">
+        <div class="step"><b>Tap Download</b><span>Use the download button on this page to get the Remibuds APK file.</span></div>
+        <div class="step"><b>Open the downloaded file</b><span>Find it in your notifications or Downloads folder and tap it.</span></div>
+        <div class="step"><b>Allow the install</b><span>If your phone asks, allow your browser to install apps — just this once — then tap Install.</span></div>
+        <div class="step"><b>Open Remibuds and allow reminders</b><span>When asked, allow notifications, exact alarms and full-screen display, so reminders can ring like an alarm.</span></div>
+      </div>
+      <p class="fineprint">Updating from an early test build? Uninstall the old version first, then install this one. Your records live on your phone — export a backup from inside the app (Settings → Export backup) before uninstalling if you want to keep them.</p>
+    </section>
+
+    <!-- DONATE -->
+    <section id="donate">
+      <div class="donate-card">
+        <img class="donate-art" src="art/art-donate.svg" alt="Capsule holding a heart">
+        <h2>Keep Remibuds running ♥</h2>
+        <p>Remibuds is free and has no ads. Your donation helps keep the app running and ad-free — any amount makes a difference.</p>
+        <div class="qr-box"><img src="donate-qr.svg" alt="UPI QR code — scan to donate to Remibuds"></div>
+        <p class="qr-cap">Scan with any UPI app — GPay, PhonePe, Paytm, or your bank app.</p>
+        <div class="donate-actions">
+          <a class="btn btn-primary" href="upi://pay?pa=jaynishad2010@okhdfcbank&amp;pn=Vijay%20Kumar&amp;aid=uGICAgIDQqveaLw">Click to pay ♥</a>
+        </div>
+        <div class="upi-row">
+          <span class="upi-id" id="upiId">jaynishad2010@okhdfcbank</span>
+          <button class="copy-btn" id="copyUpi" type="button">Copy UPI ID</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section>
+      <h2>Good to know</h2>
+      <p class="section-sub">Straight answers, no fine print.</p>
+      <div class="faq">
+        <details><summary>Is Remibuds really free?</summary>
+        <p>Yes — free to download, free to use, no ads, no subscriptions. Donations are optional and only keep the app running.</p></details>
+        <details><summary>Does it need the internet?</summary>
+        <p>No. Everything works offline, on your phone. Your data never leaves your device.</p></details>
+        <details><summary>Is my information private?</summary>
+        <p>Yes. There is no account and nothing is uploaded anywhere. Your routines and history stay on your phone, and uninstalling the app erases them — so export a backup first if you want to keep them.</p></details>
+        <details><summary>Does it work on iPhone?</summary>
+        <p>Not yet — Remibuds is Android-only for now.</p></details>
+        <details><summary>Will it ring if my phone is switched off?</summary>
+        <p>No — no alarm can ring a phone that is fully powered off. It rings reliably whenever the phone is on, even locked or in another app.</p></details>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <div class="final">
+      <a class="btn btn-primary" href="remibuds-1.6.apk" download="Remibuds-1.6.apk">⬇ Download Remibuds — Free</a>
+      <p class="version-line" style="margin-top:12px;">Version 1.6 · Android · <a href="#donate">Donate ♥</a> to keep it free</p>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="love">Made with <span class="heart">♥</span> by Vijay Mamta Sahani</p>
+    <p>Follow along on Instagram — <a href="https://www.instagram.com/momentswithvms/" target="_blank" rel="noopener">@momentswithvms</a></p>
+    <div class="foot-links">
+      <a href="remibuds-1.6.apk" download="Remibuds-1.6.apk">Download the app</a>
+      <a href="#donate">♥ Donate</a>
+      <a href="#top">Back to top</a>
+    </div>
+    <p class="tiny">Remibuds v1.6 · Free · Android only · Your data stays on your device. Remibuds records what you enter — it cannot verify that a dose was taken or a cream applied.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.getElementById('copyUpi');
+  var upi = document.getElementById('upiId').textContent.trim();
+  btn.addEventListener('click', function(){
+    function done(){
+      var old = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      setTimeout(function(){ btn.textContent = old; }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(upi).then(done, done);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = upi; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(ta); done();
+    }
+  });
+})();
+</script>
+</body>
+</html>
