@@ -1,0 +1,8 @@
+plugins { id 'com.android.application' }
+android { namespace 'app.dailycare'; compileSdk 36
+ defaultConfig { applicationId 'app.dailycare'; minSdk 26; targetSdk 36; versionCode 17; versionName '2.0.4'; testInstrumentationRunner 'app.dailycare.ReminderInstrumentation' }
+ signingConfigs { review { storeFile file('../../work/daily-care-review.jks'); storePassword System.getenv('CARE_STORE_PASSWORD'); keyAlias 'dailycare'; keyPassword System.getenv('CARE_KEY_PASSWORD') } }
+ testBuildType 'release'
+ buildTypes { release { signingConfig signingConfigs.review; minifyEnabled false } }
+}
+dependencies { testImplementation 'junit:junit:4.13.2'; testImplementation 'org.json:json:20250517' }

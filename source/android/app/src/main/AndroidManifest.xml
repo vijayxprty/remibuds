@@ -1,0 +1,39 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
+    <!-- Package visibility (Android 11+): without these, resolveActivity() cannot see
+         installed UPI payment apps or browsers, so the donate chooser and the Instagram
+         link would silently fall back instead of listing every installed app. -->
+    <queries>
+        <intent><action android:name="android.intent.action.VIEW"/><data android:scheme="upi"/></intent>
+        <intent><action android:name="android.intent.action.VIEW"/><data android:scheme="https" android:host="instagram.com"/></intent>
+    </queries>
+    <application android:theme="@android:style/Theme.Material.Light.NoActionBar" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="false" android:usesCleartextTraffic="false" android:supportsRtl="true">
+        <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:configChanges="orientation|screenSize|smallestScreenSize|keyboardHidden|density|layoutDirection" android:windowSoftInputMode="adjustResize">
+            <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+        </activity>
+        <receiver android:name=".ReminderReceiver" android:exported="false"/>
+        <!-- Gentle nudges (rotating wellness texts, in chosen nudge hours). -->
+        <!-- Quiet early alerts before the user's own reminders (no ringing). -->
+        <receiver android:name=".NudgeReceiver" android:exported="false"/>
+        <receiver android:name=".EarlyAlertReceiver" android:exported="false"/>
+        <!-- Rings the alarm sound at the set time even when the full-screen intent is
+             blocked and the activity never launches. mediaPlayback type: the service
+             plays the chosen alarm tone on the alarm stream. -->
+        <service android:name=".RingService" android:exported="false" android:foregroundServiceType="mediaPlayback"/>
+        <receiver android:name=".RestoreReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.TIME_SET"/>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED"/>
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
